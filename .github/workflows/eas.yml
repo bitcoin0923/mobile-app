@@ -1,0 +1,63 @@
+name: eas
+on:
+    workflow_dispatch:
+    push:
+        branches:
+            - production # TODO Add master branch to EAS update too.
+
+jobs:
+    update:
+        name: EAS Update
+        environment: production # TODO Switch to use branch name as environment. Currently EAS Update on master branch doesn't populate env variables.
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check for EXPO_TOKEN
+              run: |
+                  if [ -z "${{ secrets.EXPO_TOKEN }}" ]; then
+                    echo "You must provide an EXPO_TOKEN secret linked to this project's Expo account in this repo's secrets. Learn more: https://docs.expo.dev/eas-update/github-actions"
+                    exit 1
+                  fi
+
+            - name: Checkout repository
+              uses: actions/checkout@v2
+
+            - name: Setup Node
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 16.x
+                  cache: yarn
+
+            - name: Setup Expo
+              uses: expo/expo-github-action@v7
+              with:
+                  expo-version: latest
+                  eas-version: latest
+                  token: ${{ secrets.EXPO_TOKEN }}
+
+            - name: Find yarn cache
+              id: yarn-cache-path
+              run: echo "::set-output name=dir::$(yarn cache dir)"
+
+            - name: Restore cache
+              uses: actions/cache@v2
+              with:
+                  path: ${{ steps.yarn-cache-path.outputs.dir }}
+                  key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+                  restore-keys: ${{ runner.os }}-yarn-
+
+            - name: Install dependencies
+              run: yarn install --immutable
+
+            - name: Publish update
+              run: eas update --auto
+              env:
+                  AQICN_TOKEN: ${{ secrets.AQICN_TOKEN }}
+                  BACKEND_URL: ${{ secrets.BACKEND_URL }}
+                  BACKEND_SECRET: ${{ secrets.BACKEND_SECRET }}
+                  GEOAPIFY_API_KEY: ${{ secrets.GEOAPIFY_API_KEY }}
+                  SENTRY_PUBLIC_DSN: ${{ secrets.SENTRY_PUBLIC_DSN }}
+                  SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+                  SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+                  SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+                  ANDROID_GOOGLE_MAPS_KEY: ${{ secrets.ANDROID_GOOGLE_MAPS_KEY }}
+                  IOS_GOOGLE_MAPS_KEY: ${{ secrets.IOS_GOOGLE_MAPS_KEY }}

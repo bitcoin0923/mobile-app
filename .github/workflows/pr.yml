@@ -1,0 +1,24 @@
+name: pr
+
+on:
+    push:
+        branches:
+            - master
+    pull_request:
+        branches:
+            - master
+            - 'production-v*.*'
+
+jobs:
+    lint:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - run: yarn install
+            - run: yarn lint
+    test-unit:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+            - run: yarn install
+            - run: yarn test:unit

@@ -1,0 +1,50 @@
+{
+	"cli": {
+		"version": ">= 3.5.1"
+	},
+	"build": {
+		"development": {
+			"channel": "development",
+			"developmentClient": true,
+			"distribution": "internal",
+			"ios": {
+				"resourceClass": "m1-medium"
+			},
+			"env": {
+				"AQICN_TOKEN": "6bb4237574756ba29f05cea553bd22576596c11e",
+				"BACKEND_URL": "https://staging.shootismoke.vercel.app",
+				"BACKEND_SECRET": "staging-ssshhh!"
+			}
+		},
+		"preview": {
+			"channel": "master",
+			"distribution": "internal",
+			"ios": {
+				"resourceClass": "m1-medium"
+			},
+			"env": {
+				"AQICN_TOKEN": "6bb4237574756ba29f05cea553bd22576596c11e",
+				"BACKEND_URL": "https://staging.shootismoke.vercel.app",
+				"BACKEND_SECRET": "staging-ssshhh!"
+			}
+		},
+		"apk": {
+			"android": {
+				"buildType": "apk"
+			},
+			"extends": "production"
+		},
+		"production": {
+			"channel": "production",
+			"ios": {
+				"resourceClass": "m1-medium"
+			},
+			"env": {
+				"BACKEND_URL": "https://shootismoke.app"
+			}
+		}
+	},
+	"submit": {
+		"production": {}
+	}
+}
